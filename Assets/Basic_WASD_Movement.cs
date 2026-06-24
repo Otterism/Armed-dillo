@@ -8,9 +8,13 @@ public class Basic_WASD_Movement : MonoBehaviour
     [SerializeField] private float speedCap = 15f;
     [SerializeField] private Image ballIndicator;
     [SerializeField] private Rigidbody ballRb;
-    bool ballMode = false;
+    [SerializeField] private GameObject ballVisual;
+    [SerializeField] private GameObject standVisual;
+    [SerializeField] private InAir inAir;
+    public bool ballMode = false;
     float ballMinV = 0.5f;
     float acceleration = 3f;
+    float slerpStrength = 0.01f;
 
     float timeOfBallModeActivate = 0f;
     float minTimeOfBallMode = 1f;
@@ -22,12 +26,8 @@ public class Basic_WASD_Movement : MonoBehaviour
         ballIndicator.enabled = val;
         ballRb.constraints = (val) ? RigidbodyConstraints.None : RigidbodyConstraints.FreezeRotation;
         if (!val) ballRb.rotation = Quaternion.identity;
-    }
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        
+        ballVisual.SetActive(val);
+        standVisual.SetActive(!val);
     }
 
     // Update is called once per frame
@@ -37,6 +37,7 @@ public class Basic_WASD_Movement : MonoBehaviour
         else ApplyFriction();
 
         if (Input.GetKeyDown(KeyCode.LeftShift)) SetBallMode(!ballMode);
+        if (Input.GetKeyDown(KeyCode.Space) && !inAir.inAir) ballRb.velocity = new Vector3(ballRb.velocity.x, 10, ballRb.velocity.y);
     }
 
     void BallMovement()
@@ -81,6 +82,11 @@ public class Basic_WASD_Movement : MonoBehaviour
         var dot = Vector3.Dot(xzVelocity.normalized, move.normalized);
         float multiplier = (dot < 0) ? 2 : 1;  // accelerate more if opposing current velocity
         target.GetComponent<Rigidbody>().AddForce(move * multiplier * acceleration);
+
+        // slerp to redirect
+        ballRb.velocity = Vector3.Slerp(xzVelocity.normalized, move.normalized, slerpStrength * (1 - Mathf.Abs(dot)))
+            * xzVelocity.magnitude
+            + new Vector3(0, ballRb.velocity.y, 0);
     }
 
     void ApplyFriction()
