@@ -10,7 +10,7 @@ public class LizardXRotator : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (mvmt.ballMode) transform.Rotate(new Vector3(100 * Time.deltaTime * ballRb.velocity.magnitude, 0, 0), Space.Self);
+        if (mvmt.ballMode && ballRb.velocity.magnitude > 0.75f) transform.Rotate(new Vector3(100 * Time.deltaTime * ballRb.velocity.magnitude, 0, 0), Space.Self);
         //if (mvmt.ballMode) transform.RotateAround(transform.position, transform.right, 100 * Time.deltaTime * ballRb.velocity.magnitude);
     }
 }

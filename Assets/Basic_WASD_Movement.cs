@@ -5,15 +5,16 @@ using UnityEngine.UI;
 
 public class Basic_WASD_Movement : MonoBehaviour
 {
-    [SerializeField] private float speedCap = 15f;
+    [SerializeField] private float speedCap = 20f;
     [SerializeField] private Image ballIndicator;
+    [SerializeField] private Image standIndicator;
     [SerializeField] private Rigidbody ballRb;
     [SerializeField] private GameObject ballVisual;
     [SerializeField] private GameObject standVisual;
     [SerializeField] private InAir inAir;
     public bool ballMode = false;
     float ballMinV = 0.5f;
-    float acceleration = 3f;
+    float acceleration = 5f;
     float slerpStrength = 0.01f;
 
     float timeOfBallModeActivate = 0f;
@@ -24,6 +25,7 @@ public class Basic_WASD_Movement : MonoBehaviour
         string a = this.gameObject.name;
         ballMode = val;
         ballIndicator.enabled = val;
+        standIndicator.enabled = !val;
         ballRb.constraints = (val) ? RigidbodyConstraints.None : RigidbodyConstraints.FreezeRotation;
         if (!val) ballRb.rotation = Quaternion.identity;
         ballVisual.SetActive(val);
@@ -38,15 +40,17 @@ public class Basic_WASD_Movement : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.LeftShift)) SetBallMode(!ballMode);
         if (Input.GetKeyDown(KeyCode.Space) && !inAir.inAir) ballRb.velocity = new Vector3(ballRb.velocity.x, 10, ballRb.velocity.y);
+
+        if (ballRb.velocity.y < 0 && ballRb.velocity.y > -2) ballRb.AddForce(12f * Vector3.down);
     }
 
     void BallMovement()
     {
-        if (ballRb.velocity.magnitude < ballMinV && (Time.time - timeOfBallModeActivate > minTimeOfBallMode))
-        {
-            SetBallMode(!ballMode);
-            return;
-        }
+        //if (ballRb.velocity.magnitude < ballMinV && (Time.time - timeOfBallModeActivate > minTimeOfBallMode))
+        //{
+        //    SetBallMode(!ballMode);
+        //    return;
+        //}
 
         Transform target = GetComponent<FollowTarget>().target;
 
