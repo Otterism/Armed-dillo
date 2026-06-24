@@ -1,10 +1,19 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Basic_WASD_Movement : MonoBehaviour
 {
     [SerializeField] private float speedCap = 15f;
+    [SerializeField] private Image ballIndicator;
+    bool ballMode = false;
+
+    void SetMyBallMode(bool val)
+    {
+        ballMode = val;
+        ballIndicator.enabled = val;
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -14,6 +23,12 @@ public class Basic_WASD_Movement : MonoBehaviour
 
     // Update is called once per frame
     void Update()
+    {
+        if (ballMode) BallMovement();
+        if (Input.GetKeyDown(KeyCode.LeftShift)) SetMyBallMode(!ballMode);
+    }
+
+    void BallMovement()
     {
         Transform target = GetComponent<FollowTarget>().target;
 
