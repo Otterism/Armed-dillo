@@ -17,10 +17,7 @@ public class Basic_WASD_Movement : MonoBehaviour
     float acceleration = 5f;
     float slerpStrength = 0.01f;
 
-    float timeOfBallModeActivate = 0f;
-    float minTimeOfBallMode = 1f;
-
-    void SetBallMode(bool val)
+    public void SetBallMode(bool val)
     {
         string a = this.gameObject.name;
         ballMode = val;
@@ -36,7 +33,7 @@ public class Basic_WASD_Movement : MonoBehaviour
     void Update()
     {
         if (ballMode) BallMovement();
-        else ApplyFriction();
+        else if (!inAir.inAir) ApplyFriction();
 
         if (Input.GetKeyDown(KeyCode.LeftShift)) SetBallMode(!ballMode);
         if (Input.GetKeyDown(KeyCode.Space) && !inAir.inAir) ballRb.velocity = new Vector3(ballRb.velocity.x, 10, ballRb.velocity.y);
@@ -66,7 +63,7 @@ public class Basic_WASD_Movement : MonoBehaviour
         // This is only run whilst on the ground
         if (move != Vector3.zero && xzVelocity.magnitude > speedCap)
         {
-            float strength = 1f;
+            float strength = 0.5f;
 
             float A = Vector3.SignedAngle(xzVelocity * -1, move, new Vector3(1, 0, 1));
             float aRadian = Mathf.Abs(A / 180);
@@ -88,9 +85,10 @@ public class Basic_WASD_Movement : MonoBehaviour
         target.GetComponent<Rigidbody>().AddForce(move * multiplier * acceleration);
 
         // slerp to redirect
+        if (move.magnitude == 0) return; 
         ballRb.velocity = Vector3.Slerp(xzVelocity.normalized, move.normalized, slerpStrength * (1 - Mathf.Abs(dot)))
             * xzVelocity.magnitude
-            + new Vector3(0, ballRb.velocity.y, 0);
+            + new Vector3(0, ballRb.velocity.y, 0); 
     }
 
     void ApplyFriction()
@@ -105,6 +103,6 @@ public class Basic_WASD_Movement : MonoBehaviour
 
         // remove downward component from friction (otherwise falling feels floaty)
         Vector3 frictionDir = new Vector3(ballRb.velocity.normalized.x, 0, ballRb.velocity.normalized.z);
-        ballRb.AddForce(-1 * y * frictionDir);
+        ballRb.AddForce(-0.5f * y * frictionDir);
     }
 }
