@@ -39,6 +39,8 @@ public class KnockbackGunLogic : MonoBehaviour
         ammoMgr.ReduceAmmo(1);
         Instantiate(shootSFX, transform.position, Quaternion.identity);
 
+        GunRayCast();
+
         float adjustedShootStrength = (!reversed) ? -shootStrength : shootStrength;
         followTarget.target.GetComponent<Rigidbody>().velocity = transform.forward * adjustedShootStrength;
 
@@ -47,8 +49,6 @@ public class KnockbackGunLogic : MonoBehaviour
         //ballRb.rotation = (!reversed) ? transform.rotation : Quaternion.Inverse(transform.rotation);
         //if (reversed) ballRb.rotation = Quaternion.Inverse(ballRb.rotation);
         //ballRb.rotation.SetLookRotation(!reversed ? transform.forward : transform.forward * -1);
-
-        GunRayCast();
 
         transform.root.GetComponent<Basic_WASD_Movement>().SetBallMode(true);
     }
