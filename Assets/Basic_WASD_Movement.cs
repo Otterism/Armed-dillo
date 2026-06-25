@@ -11,7 +11,9 @@ public class Basic_WASD_Movement : MonoBehaviour
     [SerializeField] private Rigidbody ballRb;
     [SerializeField] private GameObject ballVisual;
     [SerializeField] private GameObject standVisual;
-    [SerializeField] private InAir inAir;
+    [SerializeField] private GameObject gunVisual;
+    [SerializeField] private InAir inAir;   
+
     public bool ballMode = false;
     float ballMinV = 0.5f;
     float acceleration = 5f;
@@ -27,6 +29,7 @@ public class Basic_WASD_Movement : MonoBehaviour
         if (!val) ballRb.rotation = Quaternion.identity;
         ballVisual.SetActive(val);
         standVisual.SetActive(!val);
+        gunVisual.SetActive(!val);
     }
 
     // Update is called once per frame
@@ -49,6 +52,7 @@ public class Basic_WASD_Movement : MonoBehaviour
         //    return;
         //}
 
+
         Transform target = GetComponent<FollowTarget>().target;
 
         float xMov = Input.GetAxisRaw("Horizontal");
@@ -63,7 +67,7 @@ public class Basic_WASD_Movement : MonoBehaviour
         // This is only run whilst on the ground
         if (move != Vector3.zero && xzVelocity.magnitude > speedCap)
         {
-            float strength = 0.5f;
+            float strength = .75f;
 
             float A = Vector3.SignedAngle(xzVelocity * -1, move, new Vector3(1, 0, 1));
             float aRadian = Mathf.Abs(A / 180);
