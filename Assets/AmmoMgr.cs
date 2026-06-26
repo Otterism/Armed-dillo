@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class AmmoMgr : MonoBehaviour
 {
@@ -8,7 +9,8 @@ public class AmmoMgr : MonoBehaviour
 
     bool isReloading;
     float reloadStartTime;
-    [SerializeField] float reloadDuration = 2;
+    [SerializeField] float reloadDuration = 1.5f;
+    [SerializeField] Image ammoDisplay;
 
 
     void Update()
@@ -17,12 +19,18 @@ public class AmmoMgr : MonoBehaviour
             StartReload();
         
         if (Time.time > reloadStartTime + reloadDuration)
+        {
             ammo = 1;
+            isReloading = false;
+        }
+
+        ammoDisplay.enabled = ammo > 0;
     }
 
     public void StartReload()
     {
-        reloadStartTime = Time.deltaTime;
+        reloadStartTime = Time.time;
+        isReloading = true;
     }
 
     public void ReduceAmmo(int _ammo)

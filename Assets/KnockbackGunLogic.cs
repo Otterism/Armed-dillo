@@ -13,14 +13,16 @@ public class KnockbackGunLogic : MonoBehaviour
     [SerializeField] private GameObject shootSFX;
     [SerializeField] private AmmoMgr ammoMgr;
     [SerializeField] private FollowTarget followTarget;
+    [SerializeField] private Basic_WASD_Movement mvmt;
 
     // Update is called once per frame
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Mouse0) && ammoMgr.ammo > 0)
         {
-            if (!transform.root.GetComponent<Basic_WASD_Movement>().ballMode)
-                Shoot(false);
+            Shoot();
+            //if (!transform.root.GetComponent<Basic_WASD_Movement>().ballMode)
+            //    Shoot(false);
         }
         if (Input.GetKeyDown(KeyCode.Mouse1))
         {
@@ -34,30 +36,33 @@ public class KnockbackGunLogic : MonoBehaviour
         }
     }
 
-    private void Shoot(bool reversed)
+    private void Shoot()
     {
         ammoMgr.ReduceAmmo(1);
         Instantiate(shootSFX, transform.position, Quaternion.identity);
 
-        GunRayCast();
+        Vector3 moveDir = (!mvmt.ballMode) ? transform.forward * -1 : mvmt.Move.normalized;
+        float adjustedShootStrength = (!mvmt.ballMode) ? shootStrength : shootStrength * 0.75f;
 
-        float adjustedShootStrength = (!reversed) ? -shootStrength : shootStrength;
-        followTarget.target.GetComponent<Rigidbody>().velocity = transform.forward * adjustedShootStrength;
+        //Vector3 flashDir = (!mvmt.ballMode) ? Vector3.forward : mvmt.Move.normalized;
 
-        ballRb.rotation = (!reversed) ? transform.rotation : transform.rotation * Quaternion.AngleAxis(180, Vector3.up);
+        Vector3 rayOrigin = (!mvmt.ballMode) ?  Camera.main.transform.position  : transform.position;
+        Vector3 rayDir = (!mvmt.ballMode) ?     Camera.main.transform.forward   : mvmt.Move.normalized;
+
+        GunRayCast(rayOrigin, rayDir);
+        followTarget.target.GetComponent<Rigidbody>().velocity = moveDir * adjustedShootStrength;
+
+        ballRb.rotation = transform.rotation;
         muzzleFlash.Flash();
-        //ballRb.rotation = (!reversed) ? transform.rotation : Quaternion.Inverse(transform.rotation);
-        //if (reversed) ballRb.rotation = Quaternion.Inverse(ballRb.rotation);
-        //ballRb.rotation.SetLookRotation(!reversed ? transform.forward : transform.forward * -1);
 
         transform.root.GetComponent<Basic_WASD_Movement>().SetBallMode(true);
     }
 
-    private void GunRayCast()
+    private void GunRayCast(Vector3 origin, Vector3 direction)
     {
         //Vector3 roughtMuzzleLocation = transform.position + transform.right * 0.5f + transform.up;
         RaycastHit hit;
-        if (Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out hit, Mathf.Infinity))
+        if (Physics.Raycast(origin, direction, out hit, Mathf.Infinity))
         {
             if (hit.transform.GetComponent<HealthMgr>())
                 hit.transform.GetComponent<HealthMgr>().DoDmg(100);

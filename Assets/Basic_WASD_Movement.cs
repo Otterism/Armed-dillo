@@ -18,6 +18,7 @@ public class Basic_WASD_Movement : MonoBehaviour
     float ballMinV = 0.5f;
     float acceleration = 5f;
     float slerpStrength = 0.01f;
+    public Vector3 Move = Vector3.zero;
 
     public void SetBallMode(bool val)
     {
@@ -57,7 +58,7 @@ public class Basic_WASD_Movement : MonoBehaviour
 
         float xMov = Input.GetAxisRaw("Horizontal");
         float zMov = Input.GetAxisRaw("Vertical");
-        Vector3 move = transform.right * xMov + transform.forward * zMov;
+        Move = transform.right * xMov + transform.forward * zMov;
         Vector3 xzVelocity = new Vector3(ballRb.velocity.x, 0, ballRb.velocity.z);
 
 
@@ -65,17 +66,17 @@ public class Basic_WASD_Movement : MonoBehaviour
         // if the user is trying to move and current velocity > maximum velocity:
         // prevent them from speeding up, but allow them to direct and counteract their currently high velocity
         // This is only run whilst on the ground
-        if (move != Vector3.zero && xzVelocity.magnitude > speedCap)
+        if (Move != Vector3.zero && xzVelocity.magnitude > speedCap)
         {
             float strength = .75f;
 
-            float A = Vector3.SignedAngle(xzVelocity * -1, move, new Vector3(1, 0, 1));
+            float A = Vector3.SignedAngle(xzVelocity * -1, Move, new Vector3(1, 0, 1));
             float aRadian = Mathf.Abs(A / 180);
 
             // reduce velocity in current direction according to how much it counteracts the current velocity, AND according to how far over maxV you are moving
             ballRb.AddForce(
                 xzVelocity.normalized
-                * (-1 * move.magnitude * acceleration * aRadian)
+                * (-1 * Move.magnitude * acceleration * aRadian)
                 * (1 + (xzVelocity.magnitude - speedCap) * Time.fixedDeltaTime)
                 * strength);
         }
@@ -84,13 +85,15 @@ public class Basic_WASD_Movement : MonoBehaviour
 
 
         // add movement
-        var dot = Vector3.Dot(xzVelocity.normalized, move.normalized);
+        var dot = Vector3.Dot(xzVelocity.normalized, Move.normalized);
         float multiplier = (dot < 0) ? 2 : 1;  // accelerate more if opposing current velocity
-        target.GetComponent<Rigidbody>().AddForce(move * multiplier * acceleration);
+        target.GetComponent<Rigidbody>().AddForce(Move * multiplier * acceleration);
 
         // slerp to redirect
-        if (move.magnitude == 0) return; 
-        ballRb.velocity = Vector3.Slerp(xzVelocity.normalized, move.normalized, slerpStrength * (1 - Mathf.Abs(dot)))
+        if (Move.magnitude == 0) return; 
+
+        float adjustedSlerpStrength = (xzVelocity.magnitude > speedCap) ? 0.03f : slerpStrength;
+        ballRb.velocity = Vector3.Slerp(xzVelocity.normalized, Move.normalized, adjustedSlerpStrength * (1 - Mathf.Abs(dot)))
             * xzVelocity.magnitude
             + new Vector3(0, ballRb.velocity.y, 0); 
     }

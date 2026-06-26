@@ -4,7 +4,10 @@ using UnityEngine;
 
 public class muzzleflash : MonoBehaviour
 {
-    [SerializeField] MeshRenderer mRenderer;
+    [SerializeField] MeshRenderer muzzleFlashRenderer;
+    [SerializeField] GameObject gun;
+    [SerializeField] GameObject stand;
+    [SerializeField] GameObject roll;
     float flashTime = 0f;
     float flashDuration = 0.25f;
 
@@ -12,12 +15,16 @@ public class muzzleflash : MonoBehaviour
     void Update()
     {
         if (flashTime + flashDuration < Time.time)
-            mRenderer.enabled = false;
+            muzzleFlashRenderer.enabled = false;
     }
 
     public void Flash()
     {
         flashTime = Time.time;
-        mRenderer.enabled = true;
+        muzzleFlashRenderer.enabled = true;
+
+        gun.SetActive(true);
+        stand.SetActive(true);
+        roll.SetActive(false);
     }
 }
