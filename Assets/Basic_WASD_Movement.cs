@@ -13,6 +13,8 @@ public class Basic_WASD_Movement : MonoBehaviour
     [SerializeField] private GameObject standVisual;
     [SerializeField] private GameObject gunVisual;
     [SerializeField] private InAir inAir;   
+    [SerializeField] private Image crosshair1;   
+    [SerializeField] private Image crosshair2;   
 
     public bool ballMode = false;
     float ballMinV = 0.5f;
@@ -32,6 +34,8 @@ public class Basic_WASD_Movement : MonoBehaviour
         ballVisual.SetActive(val);
         standVisual.SetActive(!val);
         gunVisual.SetActive(!val);
+        crosshair1.enabled = !val;
+        crosshair2.enabled = !val;
     }
 
     // Update is called once per frame

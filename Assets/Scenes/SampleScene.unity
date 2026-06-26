@@ -5063,8 +5063,11 @@ MonoBehaviour:
   standVisual: {fileID: 667236825}
   gunVisual: {fileID: 631758402}
   inAir: {fileID: 1667466024}
+  crosshair1: {fileID: 881377869}
+  crosshair2: {fileID: 1763411954}
   ballMode: 0
-  Move: {x: 0, y: 0, z: 0}
+  WorldMove: {x: 0, y: 0, z: 0}
+  LocalMove: {x: 0, y: 0, z: 0}
 --- !u!114 &1187225347
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5272,6 +5275,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   muzzleFlashRenderer: {fileID: 1326868744}
+  sphere: {fileID: 0}
   gun: {fileID: 631758402}
   stand: {fileID: 667236825}
   roll: {fileID: 135720669}
