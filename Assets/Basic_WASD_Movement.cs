@@ -18,7 +18,8 @@ public class Basic_WASD_Movement : MonoBehaviour
     float ballMinV = 0.5f;
     float acceleration = 5f;
     float slerpStrength = 0.01f;
-    public Vector3 Move = Vector3.zero;
+    public Vector3 WorldMove = Vector3.zero;
+    public Vector3 LocalMove = Vector3.zero;
 
     public void SetBallMode(bool val)
     {
@@ -58,7 +59,8 @@ public class Basic_WASD_Movement : MonoBehaviour
 
         float xMov = Input.GetAxisRaw("Horizontal");
         float zMov = Input.GetAxisRaw("Vertical");
-        Move = transform.right * xMov + transform.forward * zMov;
+        WorldMove = transform.right * xMov + transform.forward * zMov;
+        LocalMove = new Vector3(xMov, 0, zMov);
         Vector3 xzVelocity = new Vector3(ballRb.velocity.x, 0, ballRb.velocity.z);
 
 
@@ -66,17 +68,17 @@ public class Basic_WASD_Movement : MonoBehaviour
         // if the user is trying to move and current velocity > maximum velocity:
         // prevent them from speeding up, but allow them to direct and counteract their currently high velocity
         // This is only run whilst on the ground
-        if (Move != Vector3.zero && xzVelocity.magnitude > speedCap)
+        if (WorldMove != Vector3.zero && xzVelocity.magnitude > speedCap)
         {
             float strength = .75f;
 
-            float A = Vector3.SignedAngle(xzVelocity * -1, Move, new Vector3(1, 0, 1));
+            float A = Vector3.SignedAngle(xzVelocity * -1, WorldMove, new Vector3(1, 0, 1));
             float aRadian = Mathf.Abs(A / 180);
 
             // reduce velocity in current direction according to how much it counteracts the current velocity, AND according to how far over maxV you are moving
             ballRb.AddForce(
                 xzVelocity.normalized
-                * (-1 * Move.magnitude * acceleration * aRadian)
+                * (-1 * WorldMove.magnitude * acceleration * aRadian)
                 * (1 + (xzVelocity.magnitude - speedCap) * Time.fixedDeltaTime)
                 * strength);
         }
@@ -85,15 +87,15 @@ public class Basic_WASD_Movement : MonoBehaviour
 
 
         // add movement
-        var dot = Vector3.Dot(xzVelocity.normalized, Move.normalized);
+        var dot = Vector3.Dot(xzVelocity.normalized, WorldMove.normalized);
         float multiplier = (dot < 0) ? 2 : 1;  // accelerate more if opposing current velocity
-        target.GetComponent<Rigidbody>().AddForce(Move * multiplier * acceleration);
+        target.GetComponent<Rigidbody>().AddForce(WorldMove * multiplier * acceleration);
 
         // slerp to redirect
-        if (Move.magnitude == 0) return; 
+        if (WorldMove.magnitude == 0) return; 
 
         float adjustedSlerpStrength = (xzVelocity.magnitude > speedCap) ? 0.03f : slerpStrength;
-        ballRb.velocity = Vector3.Slerp(xzVelocity.normalized, Move.normalized, adjustedSlerpStrength * (1 - Mathf.Abs(dot)))
+        ballRb.velocity = Vector3.Slerp(xzVelocity.normalized, WorldMove.normalized, adjustedSlerpStrength * (1 - Mathf.Abs(dot)))
             * xzVelocity.magnitude
             + new Vector3(0, ballRb.velocity.y, 0); 
     }

@@ -5,6 +5,7 @@ using UnityEngine;
 public class muzzleflash : MonoBehaviour
 {
     [SerializeField] MeshRenderer muzzleFlashRenderer;
+    [SerializeField] Transform sphere;
     [SerializeField] GameObject gun;
     [SerializeField] GameObject stand;
     [SerializeField] GameObject roll;
@@ -18,13 +19,18 @@ public class muzzleflash : MonoBehaviour
             muzzleFlashRenderer.enabled = false;
     }
 
-    public void Flash()
+    public void Flash(Vector3 muzzleFlashDir)
     {
+        print(muzzleFlashDir);
         flashTime = Time.time;
+        muzzleFlashRenderer.transform.localPosition = muzzleFlashDir*2;
         muzzleFlashRenderer.enabled = true;
+
 
         gun.SetActive(true);
         stand.SetActive(true);
         roll.SetActive(false);
+
+
     }
 }

@@ -41,19 +41,19 @@ public class KnockbackGunLogic : MonoBehaviour
         ammoMgr.ReduceAmmo(1);
         Instantiate(shootSFX, transform.position, Quaternion.identity);
 
-        Vector3 moveDir = (!mvmt.ballMode) ? transform.forward * -1 : mvmt.Move.normalized;
+        Vector3 moveDir = (!mvmt.ballMode) ? transform.forward * -1 : mvmt.WorldMove.normalized;
         float adjustedShootStrength = (!mvmt.ballMode) ? shootStrength : shootStrength * 0.75f;
 
-        //Vector3 flashDir = (!mvmt.ballMode) ? Vector3.forward : mvmt.Move.normalized;
+        Vector3 flashDir = (!mvmt.ballMode) ? Vector3.forward : mvmt.LocalMove.normalized * -1;
 
         Vector3 rayOrigin = (!mvmt.ballMode) ?  Camera.main.transform.position  : transform.position;
-        Vector3 rayDir = (!mvmt.ballMode) ?     Camera.main.transform.forward   : mvmt.Move.normalized;
+        Vector3 rayDir = (!mvmt.ballMode) ?     Camera.main.transform.forward   : mvmt.WorldMove.normalized;
 
         GunRayCast(rayOrigin, rayDir);
         followTarget.target.GetComponent<Rigidbody>().velocity = moveDir * adjustedShootStrength;
 
         ballRb.rotation = transform.rotation;
-        muzzleFlash.Flash();
+        muzzleFlash.Flash(flashDir);
 
         transform.root.GetComponent<Basic_WASD_Movement>().SetBallMode(true);
     }
